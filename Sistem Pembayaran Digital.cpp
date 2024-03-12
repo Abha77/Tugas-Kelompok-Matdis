@@ -35,6 +35,23 @@ void update_top_up(int *saldo, int nominal){
     *saldo += nominal;
 }
 
+void transfer(int i, string NIM, int nominal){
+    int turn = 0;
+    for(int j = 0; j < MAKS; j++){
+        if(NIM == user[j].NIM){
+            user[j].saldo += nominal;
+            user[i].saldo -= nominal;
+            turn++;
+            break;
+        }
+    }
+    if(turn == 0){
+        cout << "NIM tidak ditemukan, transfer anda gagal !!!" << endl;
+    }else{
+        cout << "Transfer telah berhasil dilakukan" << endl;
+    }
+}
+
 int read_data(){
     string NIM, nama, saldo, PIN;
     ifstream baca;
@@ -84,6 +101,8 @@ void write_data(){
 }
 
 void menu(int i){
+    ulang:
+    read_data();
     system ("cls");
     cout << "==============================" << endl;
     cout << "|      QuantumDigital        |" << endl;
@@ -102,49 +121,58 @@ void menu(int i){
         case 1 :
             cout << "\n============ TopUp ============" << endl;
             cout << "Masukkan Nominal : "; cin >> nominal;
+            cin.ignore();
             update_top_up(&user[i].saldo, nominal);
             write_data();
             cout << "\nSaldo telah berhasil ditambahkan" << endl;
-            break;
+            cin.get();
+            goto ulang;
         case 2 :
             cout << "\n=========== Transfer ===========" << endl;
             cout << "Masukkan NIM Tujuan : "; cin >> NIM;
-            cout << "Masukkan Nominal : "; cin >> nominal;
+            cout << "Masukkan Nominal    : "; cin >> nominal;
+            cin.ignore();
+            transfer(i, NIM, nominal);
             write_data();
-            break;
+            cin.get();
+            goto ulang;
         case 3:
             break;
     }
-    cin.get();
 }
 
 void login(){
     read_data();
     system ("cls");
     string NIM, PIN;
+    int turn = 0;
     cout << "==============================" << endl;
     cout << "|      QuantumDigital        |" << endl;
     cout << "|          Login             |" << endl;
     cout << "==============================" << endl;
     cout << "Masukkan NIM : "; cin >> NIM;
     cout << "Masukkan PIN : "; cin >> PIN;
+    cin.ignore();
     for(int i = 0; i < MAKS; i++){
         if(NIM == user[i].NIM){
             if(PIN == user[i].PIN){
-                cout << "Login Berhasil";
+                cout << "\nLogin Berhasil";
                 cin.get();
                 menu(i);
+                cin.get();
+                turn++;
                 break;
             }else{
-                cout << "PIN yang Anda masukan salah!" << endl;
+                cout << "\nPIN yang Anda masukan salah!" << endl;
                 cout << "Silahkan Login ulang!" << endl;
+                cin.get();
+                turn++;
                 break;
             }
-        }else{
-            cout << "NIM yang Anda masukan salah!" << endl;
-            cout << "Silahkan Login ulang!" << endl;
-            break;
         }
+    }
+    if(turn == 0){
+        cout << "\nNIM tidak berhasil ditemukan !!!\nSilahkan Login Ulang !" << endl;
     }
 }
 
@@ -158,6 +186,7 @@ void sign_up(){
     cout << "Masukkan NIM  : "; cin >> user[n].NIM;
     cout << "Masukkan Nama : "; cin.ignore(); getline(cin, user[n].nama);
     cout << "Buat PIN      : "; cin >> user[n].PIN; cout << endl;
+    cin.ignore();
     cout << "\nSelamat Akun Anda Berhasil dibuat" << endl;
     user[n].saldo = 0;
     write_data();
@@ -172,11 +201,9 @@ int main(){
     switch(pilihan){
         case 1:
             login();
-            cin.get();
             goto lanjut;
         case 2:
             sign_up();
-            cin.get();
             goto lanjut;
     }
 

@@ -66,7 +66,7 @@ string dekripsi(string ciphertext){
                 plaintext += text;
             }
         }else if(isdigit(text)){
-            text = (((text - '0') - shift) + 10) % 10 + '0';
+            text = (((text - '0') - (shift % 10)) + 10) % 10 + '0';
             plaintext += text;
         }else if(text == ' '){
             plaintext += text;
